@@ -77,7 +77,7 @@ export default function AdviceResult({
       color: 'gray',
       content: parsed.references,
     },
-  ].filter((s) => s.content && (typeof s.content === 'string' ? s.content.trim() : s.content.length > 0));
+].filter((s) => s.content && typeof s.content === 'string' && s.content.trim().length > 0);
 
   const colorClasses = {
     green: 'border-green-200 hover:bg-green-50',
