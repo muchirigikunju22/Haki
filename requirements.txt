@@ -72,7 +72,7 @@ nvidia-nvtx==13.0.85
 orjson==3.11.9
 ormsgpack==1.12.2
 packaging==26.2
-pgvector==0.4.2
+pgvector==0.3.6
 propcache==0.5.2
 psycopg==3.3.4
 psycopg-binary==3.3.4
