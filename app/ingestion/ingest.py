@@ -3,7 +3,7 @@ from pathlib import Path
 from pypdf import PdfReader
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 from langchain_huggingface import HuggingFaceEmbeddings
-from langchain_postgres.vectorstores import PGVector
+from langchain_community.vectorstores import PGVector
 from dotenv import load_dotenv
 
 load_dotenv()

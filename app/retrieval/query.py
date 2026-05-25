@@ -1,7 +1,7 @@
 import os
 from groq import Groq
 from langchain_huggingface import HuggingFaceEmbeddings
-from langchain_postgres.vectorstores import PGVector
+from langchain_community.vectorstores import PGVector
 from sqlalchemy import create_engine
 from dotenv import load_dotenv
 
@@ -14,11 +14,10 @@ embeddings = HuggingFaceEmbeddings(
 )
 
 def get_vectorstore():
-    engine = create_engine(DATABASE_URL)
     return PGVector(
-        embeddings=embeddings,
-        collection_name="kenyan_laws",
-        connection=engine,
+        connection_string=DATABASE_URL,
+        embedding_function=embeddings,
+        collection_name="kenyan_laws"
     )
 
 def query_legal_advice(scenario: str) -> dict:
