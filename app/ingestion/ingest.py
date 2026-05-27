@@ -4,11 +4,14 @@ from pypdf import PdfReader
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 from langchain_huggingface import HuggingFaceEmbeddings
 from langchain_community.vectorstores import PGVector
+from sqlalchemy import create_engine
 from dotenv import load_dotenv
 
 load_dotenv()
 
-DATABASE_URL = os.getenv("DATABASE_URL")
+DATABASE_URL = os.getenv("PGVECTOR_CONNECTION_STRING") or os.getenv("DATABASE_URL")
+if DATABASE_URL:
+    DATABASE_URL = DATABASE_URL.replace("postgres://", "postgresql://")
 LAWS_DIR = Path("data/laws")
 
 embeddings = HuggingFaceEmbeddings(
@@ -34,12 +37,9 @@ def ingest_documents():
 
     for pdf_file in LAWS_DIR.glob("*.pdf"):
         print(f"Processing: {pdf_file.name}")
-        
         raw_text = extract_text_from_pdf(pdf_file)
         chunks = text_splitter.split_text(raw_text)
-        
         metadatas = [{"source": pdf_file.name, "law": pdf_file.stem} for _ in chunks]
-        
         all_chunks.extend(chunks)
         all_metadatas.extend(metadatas)
         print(f"  → {len(chunks)} chunks created")
@@ -47,16 +47,19 @@ def ingest_documents():
     print(f"\nTotal chunks: {len(all_chunks)}")
     print("Embedding and storing in PostgreSQL...")
 
-    vectorstore = PGVector.from_texts(
+    # Use postgresql:// not postgres:// — SQLAlchemy requires this
+    conn_str = DATABASE_URL.replace("postgres://", "postgresql://")
+
+    PGVector.from_texts(
         texts=all_chunks,
         embedding=embeddings,
         metadatas=all_metadatas,
-        connection=DATABASE_URL,
-        collection_name="kenyan_laws"
+        connection_string=conn_str,
+        collection_name="kenyan_laws",
+        pre_delete_collection=False
     )
 
-    print("✅ Done! All documents embedded and stored.")
-    return vectorstore
+    print("Done! All documents embedded and stored.")
 
 if __name__ == "__main__":
     ingest_documents()
