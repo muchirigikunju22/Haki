@@ -4,15 +4,19 @@ import { IconPlus, IconAlertTriangle } from "@tabler/icons-react";
 
 interface SidebarProps {
   onNewQuestion: () => void;
+  history: string[];
+  onHistoryClick: (item: string) => void;
+  onAbout: () => void;
+  onLaws: () => void;
 }
 
-export default function Sidebar({ onNewQuestion }: SidebarProps) {
-  const recentItems = [
-    "Police roadblock bribery",
-    "Arrested without reason",
-    "Detained overnight",
-    "Officer beat me",
-  ];
+export default function Sidebar({
+  onNewQuestion,
+  history,
+  onHistoryClick,
+  onAbout,
+  onLaws,
+}: SidebarProps) {
 
   return (
     <aside className="fixed left-0 top-0 w-56 h-screen bg-haki-bg border-r border-white/8 flex flex-col p-4 overflow-y-auto">
@@ -36,16 +40,21 @@ export default function Sidebar({ onNewQuestion }: SidebarProps) {
         <p className="text-haki-dim text-[11px] font-bold uppercase tracking-wider mb-3">
           Recent
         </p>
-        <div className="space-y-2">
-          {recentItems.map((item, idx) => (
-            <button
-              key={idx}
-              className="w-full text-left text-haki-muted text-sm px-3 py-2 rounded hover:bg-haki-surface2/50 transition-colors truncate hover:text-haki-text"
-              title={item}
-            >
-              {item}
-            </button>
-          ))}
+        <div className="space-y-1">
+          {history.length === 0 ? (
+            <p className="text-haki-dim text-xs px-3 py-2 italic">No recent questions</p>
+          ) : (
+            history.map((item, idx) => (
+              <button
+                key={idx}
+                onClick={() => onHistoryClick(item)}
+                className="w-full text-left text-haki-muted text-sm px-3 py-2 rounded hover:bg-haki-surface2/50 transition-colors truncate hover:text-haki-text"
+                title={item}
+              >
+                {item}
+              </button>
+            ))
+          )}
         </div>
       </div>
 
@@ -53,11 +62,17 @@ export default function Sidebar({ onNewQuestion }: SidebarProps) {
       <div className="flex-1" />
 
       {/* Bottom Nav */}
-      <div className="space-y-2 mb-4 pb-4 border-b border-white/8">
-        <button className="w-full text-left text-haki-muted text-sm px-3 py-2 rounded hover:text-haki-text hover:bg-haki-surface2/50 transition-colors">
+      <div className="space-y-1 mb-4 pb-4 border-b border-white/8">
+        <button
+          onClick={onAbout}
+          className="w-full text-left text-haki-muted text-sm px-3 py-2 rounded hover:text-haki-text hover:bg-haki-surface2/50 transition-colors"
+        >
           About Haki
         </button>
-        <button className="w-full text-left text-haki-muted text-sm px-3 py-2 rounded hover:text-haki-text hover:bg-haki-surface2/50 transition-colors">
+        <button
+          onClick={onLaws}
+          className="w-full text-left text-haki-muted text-sm px-3 py-2 rounded hover:text-haki-text hover:bg-haki-surface2/50 transition-colors"
+        >
           Laws used
         </button>
       </div>
