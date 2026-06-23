@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { IconMenu2 } from "@tabler/icons-react";
 import { Message } from "@/types";
 import { getLegalAdvice } from "@/lib/api";
 import Sidebar from "@/components/Sidebar";
@@ -19,6 +20,7 @@ export default function Home() {
     return saved ? JSON.parse(saved) : [];
   });
   const [modal, setModal] = useState<"about" | "laws" | null>(null);
+  const [sidebarOpen, setSidebarOpen] = useState(false);
 
   const saveToHistory = (scenario: string) => {
     const trimmed = scenario.length > 40 ? `${scenario.slice(0, 40)}...` : scenario;
@@ -86,10 +88,18 @@ export default function Home() {
         onHistoryClick={handleHistoryClick}
         onAbout={() => setModal("about")}
         onLaws={() => setModal("laws")}
+        isOpen={sidebarOpen}
+        onClose={() => setSidebarOpen(false)}
       />
 
       {/* Main Content - flex column that fills remaining space */}
-      <div className="flex-1 ml-56 flex flex-col overflow-hidden">
+      <div className="flex-1 md:ml-56 flex flex-col overflow-hidden">
+        <div className="md:hidden flex items-center gap-3 px-4 py-3 border-b border-white/8 shrink-0">
+          <button onClick={() => setSidebarOpen(true)}>
+            <IconMenu2 size={22} className="text-haki-muted" />
+          </button>
+          <span className="font-serif text-haki-green-light text-lg">Haki</span>
+        </div>
         {/* Views */}
         {view === "home" && (
           <HomeView

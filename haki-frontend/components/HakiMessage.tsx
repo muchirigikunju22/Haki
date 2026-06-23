@@ -61,7 +61,7 @@ export default function HakiMessage({ content, isError }: HakiMessageProps) {
       </div>
 
       {/* Advice Cards */}
-      <div className="max-w-2xl">
+  <div className="max-w-full md:max-w-2xl">
         
         <AdviceCards advice={parsedAdvice} />
 

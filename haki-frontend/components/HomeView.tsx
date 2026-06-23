@@ -48,9 +48,9 @@ export default function HomeView({
   ];
 
   return (
-    <div className="flex-1 flex flex-col items-center justify-center px-6 py-12">
+    <div className="flex-1 flex flex-col items-center justify-center px-4 md:px-6 py-12">
       {/* Heading */}
-      <h2 className="text-5xl font-serif font-bold text-center mb-3 max-w-2xl">
+      <h2 className="text-2xl md:text-4xl font-serif font-bold text-center mb-3 max-w-2xl">
         Know your{" "}
         <span className="italic text-haki-green-light">rights.</span>
       </h2>
@@ -69,7 +69,7 @@ export default function HomeView({
             <button
               key={scenario.id}
               onClick={() => onScenarioSelect(scenario.text)}
-              className="group bg-haki-surface border border-white/8 hover:border-haki-green/40 rounded-lg p-4 text-left transition-all hover:bg-haki-surface/50"
+              className="group bg-haki-surface border border-white/8 hover:border-haki-green/40 rounded-lg p-3 md:p-4 text-left transition-all hover:bg-haki-surface/50"
             >
               <div className="flex items-start gap-3">
                 <div className="shrink-0 w-8 h-8 rounded-md bg-haki-green/15 group-hover:bg-haki-green/25 flex items-center justify-center transition-colors">
@@ -89,7 +89,7 @@ export default function HomeView({
 
       {/* Trust Bar */}
       <div className="text-center mb-6">
-        <p className="text-xs text-haki-dim mb-3">Grounded in Kenyan law</p>
+        <p className="text-[11px] md:text-xs text-haki-dim mb-3">Grounded in Kenyan law</p>
         <div className="flex flex-wrap justify-center gap-x-4 gap-y-2 text-xs text-haki-dim">
           <div className="flex items-center gap-1">
             <IconCheck size={14} className="text-haki-green-light" />

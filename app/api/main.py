@@ -42,6 +42,10 @@ async def root():
 async def health():
     return {"status": "ok"}
 
+@app.get("/ping")
+async def ping():
+    return {"status": "alive"}
+
 @app.post("/ask", response_model=LegalAdviceResponse)
 async def ask_legal_question(request: ScenarioRequest):
     if not request.scenario.strip():

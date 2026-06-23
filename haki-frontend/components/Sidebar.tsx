@@ -8,6 +8,8 @@ interface SidebarProps {
   onHistoryClick: (item: string) => void;
   onAbout: () => void;
   onLaws: () => void;
+  isOpen: boolean;
+  onClose: () => void;
 }
 
 export default function Sidebar({
@@ -16,14 +18,33 @@ export default function Sidebar({
   onHistoryClick,
   onAbout,
   onLaws,
+  isOpen,
+  onClose,
 }: SidebarProps) {
-
   return (
-    <aside className="fixed left-0 top-0 w-56 h-screen bg-haki-bg border-r border-white/8 flex flex-col p-4 overflow-y-auto">
+    <>
+      <div
+        className={`fixed inset-0 bg-black/60 z-40 md:hidden ${isOpen ? "block" : "hidden"}`}
+        onClick={onClose}
+      />
+      <aside
+        className={`fixed left-0 top-0 w-72 h-screen bg-haki-bg border-r border-white/8 flex flex-col p-4 overflow-y-auto z-50 transform transition-transform duration-300 ${
+          isOpen ? "translate-x-0" : "-translate-x-full"
+        } md:translate-x-0 md:flex md:w-56 md:z-auto md:fixed md:left-0 md:top-0 md:h-screen`}
+      >
       {/* Logo */}
-      <div className="flex items-center gap-2 mb-8">
+      <div className="flex items-center justify-between gap-2 mb-8">
+        <div className="flex items-center gap-2">
         <div className="w-3 h-3 rounded-full bg-haki-green-light" />
         <h1 className="text-xl font-serif font-bold text-haki-green-light">Haki</h1>
+        </div>
+        <button
+          onClick={onClose}
+          className="md:hidden text-haki-muted text-xl leading-none"
+          aria-label="Close sidebar"
+        >
+          ×
+        </button>
       </div>
 
       {/* New Question Button */}
@@ -89,6 +110,7 @@ export default function Sidebar({
           <p>⚖️ <span className="text-haki-text">Legal Aid 0800 720 903</span></p>
         </div>
       </div>
-    </aside>
+      </aside>
+    </>
   );
 }

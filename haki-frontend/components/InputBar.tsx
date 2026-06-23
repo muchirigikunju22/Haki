@@ -55,12 +55,13 @@ export default function InputBar({
     <div
       className={`w-full flex flex-col items-center ${
         isChat
-          ? "shrink-0 bg-[#0d0d0d] border-t border-white/[0.08] px-6 pt-3 pb-4"
-          : "px-6 pt-4 pb-2"
+          ? "shrink-0 bg-[#0d0d0d] border-t border-white/[0.08] px-3 md:px-6 pt-3 pb-4"
+          : "px-4 md:px-6 pt-4 pb-2"
       }`}
+      style={{ paddingBottom: "env(safe-area-inset-bottom)" }}
     >
-      <div className="w-full max-w-2xl">
-        <div className="bg-[#1a1a1a] border border-white/[0.08] hover:border-white/[0.14] focus-within:border-haki-green rounded-xl transition-colors flex items-end gap-3 px-4 py-3">
+      <div className="w-full md:max-w-2xl">
+  <div className="bg-[#1a1a1a] border border-white/8 hover:border-white/14 focus-within:border-haki-green rounded-xl transition-colors flex items-end gap-3 px-4 py-3">
           <textarea
             ref={textareaRef}
             value={value}
