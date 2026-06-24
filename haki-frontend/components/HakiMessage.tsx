@@ -1,9 +1,10 @@
 "use client";
 
+import { useState } from "react";
 import { LegalAdviceResponse } from "@/types";
 import AdviceCards from "./AdviceCards";
 import { parseAdvice } from "@/lib/parseAdvice";
-import { IconBrandWhatsapp } from "@tabler/icons-react";
+import { IconBrandWhatsapp, IconCopy, IconCheck } from "@tabler/icons-react";
 
 interface HakiMessageProps {
   content: string | LegalAdviceResponse;
@@ -11,6 +12,7 @@ interface HakiMessageProps {
 }
 
 export default function HakiMessage({ content, isError }: HakiMessageProps) {
+  const [copied, setCopied] = useState(false);
   const isAdvice = typeof content !== "string";
 
   if (isError) {
@@ -21,9 +23,7 @@ export default function HakiMessage({ content, isError }: HakiMessageProps) {
         </div>
         <div className="flex-1 min-w-0">
           <p className="text-xs font-semibold text-red-400 mb-1">Error</p>
-          <p className="text-sm text-gray-400">
-            {typeof content === "string" ? content : "An unknown error occurred."}
-          </p>
+          <p className="text-sm text-gray-400">{typeof content === "string" ? content : ""}</p>
         </div>
       </div>
     );
@@ -45,10 +45,15 @@ export default function HakiMessage({ content, isError }: HakiMessageProps) {
     );
   }
 
-  // Type narrowing: now we know content is LegalAdviceResponse
-  
-  const advice = content as LegalAdviceResponse;
+  const advice = content;
   const parsedAdvice = parseAdvice(advice.advice);
+  const fullAdviceText = advice.advice;
+
+  const copyAdvice = () => {
+    navigator.clipboard.writeText(fullAdviceText);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
 
   return (
     <div className="w-full">
@@ -61,8 +66,7 @@ export default function HakiMessage({ content, isError }: HakiMessageProps) {
       </div>
 
       {/* Advice Cards */}
-  <div className="max-w-full md:max-w-2xl">
-        
+      <div className="max-w-2xl">
         <AdviceCards advice={parsedAdvice} />
 
         {/* Sources */}
@@ -87,7 +91,7 @@ export default function HakiMessage({ content, isError }: HakiMessageProps) {
         </p>
 
         {/* Action Buttons */}
-        <div className="mt-3 flex gap-3">
+        <div className="mt-3 flex gap-4">
           <a
             href={`https://wa.me/?text=I%20just%20got%20my%20rights%20explained%20by%20Haki%3A%20https%3A%2F%2Fhaki.co.ke`}
             target="_blank"
@@ -97,6 +101,13 @@ export default function HakiMessage({ content, isError }: HakiMessageProps) {
             <IconBrandWhatsapp size={14} />
             Share
           </a>
+          <button
+            onClick={copyAdvice}
+            className="inline-flex items-center gap-1 text-gray-500 hover:text-gray-300 text-xs transition-colors"
+          >
+            {copied ? <IconCheck size={14} className="text-haki-green-light" /> : <IconCopy size={14} />}
+            {copied ? "Copied" : "Copy"}
+          </button>
         </div>
       </div>
     </div>
