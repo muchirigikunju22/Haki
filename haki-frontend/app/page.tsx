@@ -1,7 +1,6 @@
 "use client";
 
-import { useState } from "react";
-import { IconMenu2 } from "@tabler/icons-react";
+import { useState, useEffect } from "react";
 import { Message } from "@/types";
 import { getLegalAdvice } from "@/lib/api";
 import Sidebar from "@/components/Sidebar";
@@ -9,24 +8,90 @@ import HomeView from "@/components/HomeView";
 import ChatView from "@/components/ChatView";
 import InputBar from "@/components/InputBar";
 
+// Generate a random session ID
+function generateSessionId(): string {
+  return Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
+}
+
 export default function Home() {
   const [messages, setMessages] = useState<Message[]>([]);
   const [inputValue, setInputValue] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [view, setView] = useState<"home" | "chat">("home");
-  const [history, setHistory] = useState<string[]>(() => {
-    if (typeof window === "undefined") return [];
-    const saved = localStorage.getItem("haki_history");
-    return saved ? JSON.parse(saved) : [];
-  });
+  const [history, setHistory] = useState<string[]>([]);
   const [modal, setModal] = useState<"about" | "laws" | null>(null);
-  const [sidebarOpen, setSidebarOpen] = useState(false);
+  
+  // Session management
+  const [sessionId, setSessionId] = useState<string>("");
+  const [isAnonymous, setIsAnonymous] = useState<boolean>(false);
+
+  // Initialize session on mount
+  useEffect(() => {
+    const initializeSession = async () => {
+      const savedMode = localStorage.getItem("haki_mode");
+      const savedSessionId = localStorage.getItem("haki_session_id");
+      
+      if (savedMode === "anonymous") {
+        setIsAnonymous(true);
+      } else {
+        // Session mode
+        if (savedSessionId) {
+          setSessionId(savedSessionId);
+          // Load history for this session
+          const savedHistory = localStorage.getItem(`haki_history_${savedSessionId}`);
+          if (savedHistory) {
+            setHistory(JSON.parse(savedHistory));
+          }
+        } else {
+          // Create new session
+          const newSessionId = generateSessionId();
+          setSessionId(newSessionId);
+          localStorage.setItem("haki_session_id", newSessionId);
+        }
+      }
+    };
+    
+    initializeSession();
+  }, []);
+
+  const toggleMode = () => {
+    if (isAnonymous) {
+      // Switch to session mode
+      const newSessionId = generateSessionId();
+      setSessionId(newSessionId);
+      localStorage.setItem("haki_session_id", newSessionId);
+      localStorage.setItem("haki_mode", "session");
+      setIsAnonymous(false);
+      setHistory([]);
+    } else {
+      // Switch to anonymous mode
+      localStorage.setItem("haki_mode", "anonymous");
+      localStorage.removeItem("haki_session_id");
+      setIsAnonymous(true);
+      setHistory([]);
+      setMessages([]);
+      setView("home");
+    }
+  };
+
+  const clearSession = () => {
+    if (sessionId) {
+      localStorage.removeItem(`haki_history_${sessionId}`);
+    }
+    setHistory([]);
+    setMessages([]);
+    setView("home");
+  };
 
   const saveToHistory = (scenario: string) => {
-    const trimmed = scenario.length > 40 ? `${scenario.slice(0, 40)}...` : scenario;
+    if (isAnonymous) return; // Don't save in anonymous mode
+    
+    const trimmed = scenario.length > 40 ? scenario.slice(0, 40) + "..." : scenario;
     setHistory((prev) => {
-      const updated = [trimmed, ...prev.filter((item) => item !== trimmed)].slice(0, 8);
-      localStorage.setItem("haki_history", JSON.stringify(updated));
+      const updated = [trimmed, ...prev.filter((h) => h !== trimmed)].slice(0, 8);
+      if (sessionId) {
+        localStorage.setItem(`haki_history_${sessionId}`, JSON.stringify(updated));
+      }
       return updated;
     });
   };
@@ -81,25 +146,18 @@ export default function Home() {
 
   return (
     <div className="h-screen flex overflow-hidden">
-      {/* Sidebar */}
       <Sidebar
         onNewQuestion={handleNewQuestion}
         history={history}
         onHistoryClick={handleHistoryClick}
         onAbout={() => setModal("about")}
         onLaws={() => setModal("laws")}
-        isOpen={sidebarOpen}
-        onClose={() => setSidebarOpen(false)}
+        isAnonymous={isAnonymous}
+        onToggleMode={toggleMode}
+        onClearSession={clearSession}
       />
 
-      {/* Main Content - flex column that fills remaining space */}
       <div className="flex-1 md:ml-56 flex flex-col overflow-hidden">
-        <div className="md:hidden flex items-center gap-3 px-4 py-3 border-b border-white/8 shrink-0">
-          <button onClick={() => setSidebarOpen(true)}>
-            <IconMenu2 size={22} className="text-haki-muted" />
-          </button>
-          <span className="font-serif text-haki-green-light text-lg">Haki</span>
-        </div>
         {/* Views */}
         {view === "home" && (
           <HomeView
@@ -108,6 +166,7 @@ export default function Home() {
             onInputChange={setInputValue}
             onSubmit={handleSubmit}
             isLoading={isLoading}
+            isAnonymous={isAnonymous}
           />
         )}
 
@@ -140,8 +199,8 @@ export default function Home() {
                 <h2 className="text-xl font-serif text-haki-green-light mb-4">About Haki</h2>
                 <p className="text-sm text-haki-muted leading-relaxed mb-4">
                   Haki is a legal rights platform for Kenyan citizens. Most people
-                  dont know their rights — not because they dont care, but because
-                  the law is written in complex language thats hard to understand.
+                  don&apos;t know their rights — not because they don&apos;t care, but because
+                  the law is written in complex language that&apos;s hard to understand.
                   Haki bridges that gap.
                 </p>
                 <p className="text-sm text-haki-muted leading-relaxed mb-4">
@@ -160,7 +219,7 @@ export default function Home() {
                   </p>
                 </div>
                 <div className="bg-amber-500/10 border border-amber-500/20 rounded-xl p-4">
-                  <p className="text-xs text-amber-400 leading-relaxed">
+                <p className="text-xs text-haki-dim leading-relaxed">
                     Haki provides legal information, not legal advice. It is not a
                     substitute for professional legal representation. Always consult
                     a qualified lawyer for your specific situation.

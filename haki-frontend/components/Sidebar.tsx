@@ -1,6 +1,6 @@
 "use client";
 
-import { IconPlus, IconAlertTriangle } from "@tabler/icons-react";
+import { IconPlus, IconAlertTriangle, IconEye, IconEyeOff, IconTrash } from "@tabler/icons-react";
 
 interface SidebarProps {
   onNewQuestion: () => void;
@@ -8,8 +8,9 @@ interface SidebarProps {
   onHistoryClick: (item: string) => void;
   onAbout: () => void;
   onLaws: () => void;
-  isOpen: boolean;
-  onClose: () => void;
+  isAnonymous: boolean;
+  onToggleMode: () => void;
+  onClearSession: () => void;
 }
 
 export default function Sidebar({
@@ -18,52 +19,73 @@ export default function Sidebar({
   onHistoryClick,
   onAbout,
   onLaws,
-  isOpen,
-  onClose,
+  isAnonymous,
+  onToggleMode,
+  onClearSession,
 }: SidebarProps) {
   return (
-    <>
-      <div
-        className={`fixed inset-0 bg-black/60 z-40 md:hidden ${isOpen ? "block" : "hidden"}`}
-        onClick={onClose}
-      />
-      <aside
-        className={`fixed left-0 top-0 w-72 h-screen bg-haki-bg border-r border-white/8 flex flex-col p-4 overflow-y-auto z-50 transform transition-transform duration-300 ${
-          isOpen ? "translate-x-0" : "-translate-x-full"
-        } md:translate-x-0 md:flex md:w-56 md:z-auto md:fixed md:left-0 md:top-0 md:h-screen`}
-      >
+    <aside className="fixed left-0 top-0 w-56 h-screen bg-haki-bg border-r border-white/8 flex flex-col p-4 overflow-y-auto">
       {/* Logo */}
-      <div className="flex items-center justify-between gap-2 mb-8">
-        <div className="flex items-center gap-2">
+      <div className="flex items-center gap-2 mb-6">
         <div className="w-3 h-3 rounded-full bg-haki-green-light" />
         <h1 className="text-xl font-serif font-bold text-haki-green-light">Haki</h1>
+      </div>
+
+      {/* Mode Toggle */}
+      <div className="mb-4 p-3 bg-[#0d0d0d] border border-white/5 rounded-xl">
+        <div className="flex items-center justify-between mb-2">
+          <span className="text-xs text-haki-dim font-semibold uppercase tracking-wider">
+            {isAnonymous ? "Anonymous" : "Session"}
+          </span>
+          <button
+            onClick={onToggleMode}
+            className="text-haki-green-light hover:text-haki-green transition-colors"
+            title={isAnonymous ? "Switch to session mode" : "Switch to anonymous mode"}
+          >
+            {isAnonymous ? <IconEyeOff size={16} /> : <IconEye size={16} />}
+          </button>
         </div>
-        <button
-          onClick={onClose}
-          className="md:hidden text-haki-muted text-xl leading-none"
-          aria-label="Close sidebar"
-        >
-          ×
-        </button>
+        <p className="text-[11px] text-haki-dim leading-relaxed">
+          {isAnonymous
+            ? "No history saved. Each visit is completely private."
+            : "History saved for this browser session only."}
+        </p>
       </div>
 
       {/* New Question Button */}
       <button
         onClick={onNewQuestion}
-        className="w-full flex items-center justify-center gap-2 bg-haki-surface2 hover:bg-haki-surface2/80 text-haki-text px-4 py-2.5 rounded-lg font-medium text-sm transition-colors mb-6 border border-white/8 hover:border-white/12"
+        className="w-full flex items-center justify-center gap-2 bg-haki-surface2 hover:bg-haki-surface2/80 text-haki-text px-4 py-2.5 rounded-lg font-medium text-sm transition-colors mb-4 border border-white/8 hover:border-white/12"
       >
         <IconPlus size={18} />
         New question
       </button>
 
       {/* Recent Section */}
-      <div className="mb-6">
-        <p className="text-haki-dim text-[11px] font-bold uppercase tracking-wider mb-3">
-          Recent
-        </p>
+      <div className="mb-4 flex-1">
+        <div className="flex items-center justify-between mb-2">
+          <p className="text-haki-dim text-[11px] font-bold uppercase tracking-wider">
+            Recent
+          </p>
+          {!isAnonymous && history.length > 0 && (
+            <button
+              onClick={onClearSession}
+              className="text-haki-dim hover:text-red-400 transition-colors"
+              title="Clear session history"
+            >
+              <IconTrash size={14} />
+            </button>
+          )}
+        </div>
         <div className="space-y-1">
-          {history.length === 0 ? (
-            <p className="text-haki-dim text-xs px-3 py-2 italic">No recent questions</p>
+          {isAnonymous ? (
+            <p className="text-haki-dim text-xs px-3 py-2 italic">
+              Anonymous mode — no history saved
+            </p>
+          ) : history.length === 0 ? (
+            <p className="text-haki-dim text-xs px-3 py-2 italic">
+              No recent questions
+            </p>
           ) : (
             history.map((item, idx) => (
               <button
@@ -78,9 +100,6 @@ export default function Sidebar({
           )}
         </div>
       </div>
-
-      {/* Spacer */}
-      <div className="flex-1" />
 
       {/* Bottom Nav */}
       <div className="space-y-1 mb-4 pb-4 border-b border-white/8">
@@ -110,7 +129,6 @@ export default function Sidebar({
           <p>⚖️ <span className="text-haki-text">Legal Aid 0800 720 903</span></p>
         </div>
       </div>
-      </aside>
-    </>
+    </aside>
   );
 }

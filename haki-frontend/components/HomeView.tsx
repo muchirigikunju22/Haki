@@ -6,6 +6,7 @@ import {
   IconMoon,
   IconAlertTriangle,
   IconCheck,
+  IconEyeOff,
 } from "@tabler/icons-react";
 import InputBar from "./InputBar";
 
@@ -15,6 +16,7 @@ interface HomeViewProps {
   onInputChange: (value: string) => void;
   onSubmit: () => void;
   isLoading: boolean;
+  isAnonymous?: boolean;
 }
 
 export default function HomeView({
@@ -23,6 +25,7 @@ export default function HomeView({
   onInputChange,
   onSubmit,
   isLoading,
+  isAnonymous = false,
 }: HomeViewProps) {
   const scenarios = [
     {
@@ -49,6 +52,14 @@ export default function HomeView({
 
   return (
     <div className="flex-1 flex flex-col items-center justify-center px-4 md:px-6 py-12">
+      {/* Anonymous Mode Banner */}
+      {isAnonymous && (
+        <div className="flex items-center justify-center gap-2 text-haki-dim text-xs mb-8 p-2 rounded bg-[#0d0d0d] border border-white/5">
+          <IconEyeOff size={14} />
+          <span>Anonymous mode — no history will be saved</span>
+        </div>
+      )}
+
       {/* Heading */}
       <h2 className="text-2xl md:text-4xl font-serif font-bold text-center mb-3 max-w-2xl">
         Know your{" "}
