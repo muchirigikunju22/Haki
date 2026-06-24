@@ -11,4 +11,4 @@ pypdf
 groq
 pydantic
 numpy
-fastembed
+fastembed==0.6.0

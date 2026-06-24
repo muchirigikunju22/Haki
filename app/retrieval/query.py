@@ -22,7 +22,14 @@ vectorstore = PGVector(
 print("Ready.")
 
 def query_legal_advice(scenario: str) -> dict:
+    print(f"DEBUG: Querying scenario: {scenario[:60]}...")
+    
     relevant_docs = vectorstore.similarity_search(scenario, k=8)
+    
+    print(f"DEBUG: Retrieved {len(relevant_docs)} documents")
+    for i, doc in enumerate(relevant_docs[:3]):
+        preview = doc.page_content[:80].replace("\n", " ")
+        print(f"DEBUG: Doc {i+1}: {doc.metadata.get('law', 'unknown')} | {preview}...")
 
     context = ""
     sources = []
