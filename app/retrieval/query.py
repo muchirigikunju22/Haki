@@ -17,7 +17,7 @@ print("Connecting to vectorstore...")
 vectorstore = PGVector(
     connection_string=DATABASE_URL,
     embedding_function=embeddings,
-    collection_name="kenyan_laws"
+    collection_name="kenyan_laws_v2"
 )
 print("Ready.")
 
