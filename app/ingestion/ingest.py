@@ -2,9 +2,8 @@ import os
 from pathlib import Path
 from pypdf import PdfReader
 from langchain_text_splitters import RecursiveCharacterTextSplitter
-from langchain_huggingface import HuggingFaceEmbeddings
+from langchain_huggingface import HuggingFaceEndpointEmbeddings
 from langchain_community.vectorstores import PGVector
-from sqlalchemy import create_engine
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -12,10 +11,12 @@ load_dotenv()
 DATABASE_URL = os.getenv("PGVECTOR_CONNECTION_STRING") or os.getenv("DATABASE_URL")
 if DATABASE_URL:
     DATABASE_URL = DATABASE_URL.replace("postgres://", "postgresql://")
+
 LAWS_DIR = Path("data/laws")
 
-embeddings = HuggingFaceEmbeddings(
-    model_name="sentence-transformers/all-MiniLM-L6-v2"
+embeddings = HuggingFaceEndpointEmbeddings(
+    model="sentence-transformers/all-MiniLM-L6-v2",
+    huggingfacehub_api_token=os.getenv("HF_TOKEN")
 )
 
 def extract_text_from_pdf(pdf_path: Path) -> str:
@@ -47,7 +48,6 @@ def ingest_documents():
     print(f"\nTotal chunks: {len(all_chunks)}")
     print("Embedding and storing in PostgreSQL...")
 
-    # Use postgresql:// not postgres:// — SQLAlchemy requires this
     conn_str = DATABASE_URL.replace("postgres://", "postgresql://")
 
     PGVector.from_texts(
