@@ -2,8 +2,8 @@ import os
 from pathlib import Path
 from pypdf import PdfReader
 from langchain_text_splitters import RecursiveCharacterTextSplitter
-from langchain_huggingface import HuggingFaceEndpointEmbeddings
 from langchain_community.vectorstores import PGVector
+from langchain_community.embeddings.fastembed import FastEmbedEmbeddings
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -14,10 +14,7 @@ if DATABASE_URL:
 
 LAWS_DIR = Path("data/laws")
 
-embeddings = HuggingFaceEndpointEmbeddings(
-    model="sentence-transformers/all-MiniLM-L6-v2",
-    huggingfacehub_api_token=os.getenv("HF_TOKEN")
-)
+embeddings = FastEmbedEmbeddings(model_name="BAAI/bge-small-en-v1.5")
 
 def extract_text_from_pdf(pdf_path: Path) -> str:
     reader = PdfReader(pdf_path)
@@ -55,8 +52,8 @@ def ingest_documents():
         embedding=embeddings,
         metadatas=all_metadatas,
         connection_string=conn_str,
-        collection_name="kenyan_laws",
-        pre_delete_collection=False
+        collection_name="kenyan_laws_v2",
+        pre_delete_collection=True
     )
 
     print("Done! All documents embedded and stored.")

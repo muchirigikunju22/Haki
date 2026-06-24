@@ -1,7 +1,7 @@
 import os
 from groq import Groq
-from langchain_community.embeddings import HuggingFaceInferenceAPIEmbeddings
 from langchain_community.vectorstores import PGVector
+from langchain_community.embeddings.fastembed import FastEmbedEmbeddings
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -10,11 +10,8 @@ DATABASE_URL = os.getenv("PGVECTOR_CONNECTION_STRING") or os.getenv("DATABASE_UR
 if DATABASE_URL:
     DATABASE_URL = DATABASE_URL.replace("postgres://", "postgresql://")
 
-print("Connecting to embeddings API...")
-embeddings = HuggingFaceInferenceAPIEmbeddings(
-    api_key=os.getenv("HF_TOKEN"),
-    model_name="sentence-transformers/all-MiniLM-L6-v2"
-)
+print("Loading embeddings model...")
+embeddings = FastEmbedEmbeddings(model_name="BAAI/bge-small-en-v1.5")
 
 print("Connecting to vectorstore...")
 vectorstore = PGVector(
